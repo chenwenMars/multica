@@ -707,7 +707,7 @@ export function ManualCreatePanel({
               type="button"
               className="ml-7 mt-2 text-body text-primary hover:underline cursor-pointer"
               onClick={() => {
-                router.push(p.issueDetail(issue.id));
+                router.push(p.issueDetail(issue.identifier));
                 toast.dismiss(toastId);
               }}
             >
@@ -818,7 +818,7 @@ export function ManualCreatePanel({
                   type="button"
                   className="ml-7 mt-2 text-body text-primary hover:underline cursor-pointer"
                   onClick={() => {
-                    router.push(p.issueDetail(dup.issue.id));
+                    router.push(p.issueDetail(dup.issue.identifier));
                     toast.dismiss(toastId);
                   }}
                 >
@@ -985,7 +985,6 @@ export function ManualCreatePanel({
               shortcut={sendShortcut}
               decorative
               className="ml-1 max-sm:hidden"
-              keyClassName="border-background/30 bg-background/15 text-primary-foreground shadow-none"
             />
           ) : null}
         </>

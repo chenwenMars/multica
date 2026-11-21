@@ -374,7 +374,7 @@ export const DraggableBoardCard = memo(function DraggableBoardCard({
   const p = useWorkspacePaths();
   const peek = useIssuePeekActions();
   const peeked = useIsIssuePeeked(issue.id);
-  const peekLinkProps = useIssuePeekLinkProps(issue.id);
+  const peekLinkProps = useIssuePeekLinkProps(issue);
   const {
     attributes,
     listeners,
@@ -420,7 +420,7 @@ export const DraggableBoardCard = memo(function DraggableBoardCard({
         }
       >
         <AppLink
-          href={p.issueDetail(issue.id)}
+          href={p.issueDetail(issue.identifier)}
           newTabTitle={issue.identifier}
           className={`group block transition-colors ${isDragging ? "pointer-events-none" : ""}`}
           {...peekLinkProps}
