@@ -65,13 +65,13 @@
   },
   "detail": {
     "select_prompt": "Sélectionnez une notification pour afficher les détails",
-    "empty": "Votre boîte de réception est vide",
     "original_input": "Saisie d'origine",
     "retry_with_context": "Réessayer avec le contexte",
     "edit_advanced": "Ouvrir le formulaire complet",
     "autopilot_quota_exceeded_body": "Cet espace de travail a atteint sa limite de {{limit}} exécutions d'autopilot pour la période en cours. Les exécutions suivantes ne démarreront pas avant la réinitialisation de l'allocation {{resetAt}}, ou avant que l'espace de travail change de forfait ou achète des exécutions.",
     "project_owner_joined_body": "{{name}}, propriétaire de l’espace de travail, s’est ajouté à ce projet privé et peut désormais voir ses tâches, commentaires et pièces jointes.",
     "open_project": "Ouvrir le projet",
+    "open_app": "Ouvrir l'app",
     "autopilot_quota_upgrade": "Voir les options",
     "archive": "Archiver",
     "unarchive": "Désarchiver",
@@ -225,11 +225,29 @@
     "title": "Archiver les notifications une fois traitées",
     "description": "La boîte de réception peut désormais archiver les notifications d'une tâche quand vous agissez dessus. Seules vos propres actions comptent, et une nouvelle notification fait revenir la tâche.",
     "options": {
-      "handled": "Les tâches traitées quittent votre boîte de réception",
+      "handled": "Terminer une tâche ou lancer un agent l'archive ; l'organiser ou commenter sans réveiller d'agent la laisse en place",
       "completed": "Seul le fait de terminer ou d'annuler une tâche l'archive",
       "never": "Vous archivez vous-même les notifications"
     },
     "hint": "Modifiable dans Paramètres › Notifications",
     "confirm": "Terminé"
+  },
+  "zero": {
+    "cleared_title": "Boîte de réception vide",
+    "just_archived": "{{label}} archivé",
+    "just_snoozed": "{{label}} reporté jusqu’au {{time}}",
+    "just_unsubscribed": "Désabonné et archivé : {{label}}",
+    "just_archived_many_one": "{{count}} notification archivée",
+    "just_archived_many_other": "{{count}} notifications archivées",
+    "snoozed_summary_one": "{{count}} reportée · retour {{time}}",
+    "snoozed_summary_other": "{{count}} reportées · prochain retour {{time}}",
+    "bar_snoozed_one": "{{count}} reportée",
+    "bar_snoozed_other": "{{count}} reportées",
+    "go_to_my_work": "Aller à Mon travail",
+    "filtered_title": "Tout est traité pour ce filtre",
+    "filtered_remaining_one": "{{count}} autre notification dans votre boîte de réception",
+    "filtered_remaining_other": "{{count}} autres notifications dans votre boîte de réception",
+    "clear_and_continue": "Effacer les filtres et continuer",
+    "undo_item": "Annuler {{label}}"
   }
 }

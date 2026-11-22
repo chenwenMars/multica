@@ -2,7 +2,6 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { useWorkspaceId } from "@multica/core/hooks";
 import { type InboxBarAction, takeInboxAutoArchive, takeInboxBarAction } from "@multica/core/inbox/auto-archive";
 import type { KeptInboxRow } from "@multica/core/inbox/open-row";
@@ -12,19 +11,21 @@ import { notificationPreferenceOptions } from "@multica/core/notification-prefer
 import { notificationPreferenceValue } from "@multica/core/notification-preferences/patch";
 import type { InboxItem, Issue } from "@multica/core/types";
 import { useT } from "../../i18n";
+import { toastInboxUndo } from "./inbox-undo-toast";
 import { useRestoreInbox } from "./use-leave-inbox-row";
 
 /**
- * Opens the next notification once the open one is archived because the user
- * handled its issue (`takeInboxAutoArchive`), when their `after_auto_archive`
- * preference says "next", and confirms it with a toast that can undo it.
- * Otherwise the row stays in place, settled, as `keepOpenInboxRow` keeps it.
+ * Opens the next notification right away once the open one is archived because
+ * the user handled its issue (`takeInboxAutoArchive`), when their
+ * `after_auto_archive` preference says "next", and confirms it with a toast
+ * that can undo it. Otherwise the row stays in place, settled, as
+ * `keepOpenInboxRow` keeps it.
  *
  * Only the focused window moves on: acting in another window or tab must not
  * pull this one away from what it shows.
  *
- * Returns the Inbox bar action that archived the settled row, when it was
- * taken in this window, so the bar can say what the user did.
+ * Returns the Inbox bar action that archived the settled row, when taken in
+ * this window.
  */
 export function useMoveOnAfterAutoArchive({
   settled,
@@ -49,26 +50,26 @@ export function useMoveOnAfterAutoArchive({
     latest.current = { settled, next, onNext, movesOn };
   });
 
-  // Before paint, so the settled bar never shows the plain archive first.
+  // Before paint, so the settled bar never flashes before the next issue opens.
   useLayoutEffect(() => {
     if (!archivedKey) return;
-    const { settled: row, next: nextRow, onNext: moveOn, movesOn: moves } = latest.current;
+    const { settled: row, onNext: moveOn, movesOn: moves } = latest.current;
     const own = takeInboxAutoArchive(archivedKey);
     const action = takeInboxBarAction(archivedKey);
     const shown = own && action && reflects(qc.getQueryData(issueDetailOptions(wsId, archivedKey).queryKey), action);
     setCause(shown ? { key: archivedKey, action } : null);
-    if (!own || !moves || !row || !nextRow || !document.hasFocus()) return;
+    if (!own || !moves || !row || !document.hasFocus()) return;
     moveOn();
-    toast.success(t(($) => $.toasts.archived), {
-      action: {
-        label: t(($) => $.toasts.undo),
-        onClick: () => {
-          useInboxSelectionStore.getState().returnRow(wsId, archivedKey);
-          void restore(row.item.id, { quiet: true });
-        },
+    toastInboxUndo(t(($) => $.toasts.archived), {
+      label: t(($) => $.toasts.undo),
+      undo: () => {
+        const store = useInboxSelectionStore.getState();
+        store.returnRow(wsId, archivedKey);
+        store.clearLastCleared(wsId, archivedKey);
+        void restore(row.item.id, { quiet: true });
       },
     });
-  }, [archivedKey, wsId, qc, restore, t]);
+  }, [archivedKey, wsId, restore, t, qc]);
 
   return cause && cause.key === archivedKey ? cause.action : null;
 }
