@@ -69,7 +69,6 @@ import type {
   TelegramInstallation,
   ListTelegramInstallationsResponse,
   RedeemTelegramBindingTokenResponse,
-  GroupedIssuesResponse,
   GitHubConnectResponse,
   IssuePullRequestsResponse,
   IssueEnvironmentsResponse,
@@ -1001,10 +1000,6 @@ export const ListQuickActionsResponseSchema = z.object({
 export const EMPTY_LIST_QUICK_ACTIONS_RESPONSE: ListQuickActionsResponse = {
   quick_actions: [],
 };
-
-export const QuickActionRenderSchema = z.object({
-  content: z.string().default(""),
-}).loose();
 
 export const ListPropertiesResponseSchema = z.object({
   properties: z.array(IssuePropertySchema).default([]),
@@ -2032,22 +2027,6 @@ export const SearchIndexChangesSchema = z.object({
   has_more: z.boolean(),
 }).loose();
 
-const IssueAssigneeGroupSchema = z.object({
-  id: z.string(),
-  assignee_type: z.string().nullable(),
-  assignee_id: z.string().nullable(),
-  issues: z.array(IssueSchema).default([]),
-  total: z.number().default(0),
-}).loose();
-
-export const GroupedIssuesResponseSchema = z.object({
-  groups: z.array(IssueAssigneeGroupSchema).default([]),
-}).loose();
-
-export const EMPTY_GROUPED_ISSUES_RESPONSE: GroupedIssuesResponse = {
-  groups: [],
-};
-
 const IssueTableActorRefSchema = z.object({
   // Server-driven enums stay open so installed desktop clients survive a
   // backend that introduces another actor kind.
@@ -2290,6 +2269,12 @@ const DashboardUsageByAgentSchema = z.object({
 
 export const DashboardUsageByAgentListSchema = z.array(DashboardUsageByAgentSchema);
 
+const DashboardUsageBySquadSchema = DashboardUsageByAgentSchema.extend({
+  squad_id: z.string().default(""),
+}).loose();
+
+export const DashboardUsageBySquadListSchema = z.array(DashboardUsageBySquadSchema);
+
 // `cancelled_count` defaults to 0 so an installed client pointed at a
 // backend that predates it still renders: those rows simply carry no
 // cancelled segment, which is exactly what that backend measured.
@@ -2303,6 +2288,12 @@ const DashboardAgentRunTimeSchema = z.object({
 }).loose();
 
 export const DashboardAgentRunTimeListSchema = z.array(DashboardAgentRunTimeSchema);
+
+const DashboardSquadRunTimeSchema = DashboardAgentRunTimeSchema.extend({
+  squad_id: z.string().default(""),
+}).loose();
+
+export const DashboardSquadRunTimeListSchema = z.array(DashboardSquadRunTimeSchema);
 
 const DashboardRunTimeDailySchema = z.object({
   date: z.string().default(""),
@@ -2340,6 +2331,14 @@ export const DashboardFailureByAgentListSchema = z.array(
   DashboardFailureByAgentSchema,
 );
 
+const DashboardFailureBySquadSchema = DashboardFailureByAgentSchema.extend({
+  squad_id: z.string().default(""),
+}).loose();
+
+export const DashboardFailureBySquadListSchema = z.array(
+  DashboardFailureBySquadSchema,
+);
+
 // Runtime usage schemas — the runtime-detail page's four usage endpoints
 // (`/api/runtimes/:id/usage*`). Same leniency rules as the dashboard
 // schemas above: numbers default to 0, strings to "", `.loose()` passes
@@ -2358,13 +2357,6 @@ const RuntimeUsageSchema = z.object({
 }).loose();
 
 export const RuntimeUsageListSchema = z.array(RuntimeUsageSchema);
-
-const RuntimeHourlyActivitySchema = z.object({
-  hour: z.number().default(0),
-  count: z.number().default(0),
-}).loose();
-
-export const RuntimeHourlyActivityListSchema = z.array(RuntimeHourlyActivitySchema);
 
 const RuntimeUsageByAgentSchema = z.object({
   agent_id: z.string().default(""),
@@ -2540,6 +2532,8 @@ export const AgentTaskSchema = z.object({
   created_at: z.string().default(""),
   chat_session_id: z.string().optional(),
   autopilot_run_id: z.string().optional(),
+  squad_id: z.string().optional().catch(undefined),
+  is_leader_task: z.boolean().optional().catch(undefined),
   parent_task_id: z.string().optional(),
   attempt: z.number().optional(),
   trigger_comment_id: z.string().optional(),
@@ -5078,9 +5072,11 @@ const AppCatalogEntrySchema = z.object({
   name: z.string().default(""),
   logo: z.string().optional().catch(undefined),
   category: z.string().optional().catch(undefined),
+  category_id: z.string().optional().catch(undefined),
   curated: z.boolean().default(false).catch(false),
   recommended_scope: AppAccountScopeSchema.optional(),
   allowed: z.boolean().optional().catch(undefined),
+  connect_method: z.enum(["oauth", "key"]).optional().catch(undefined),
 }).loose();
 
 export const AppCatalogResponseSchema = z.object({
@@ -5159,17 +5155,6 @@ export const AppRequestSchema = z.object({
 export const AppRequestListSchema = z.object({
   requests: z.array(AppRequestSchema).default([]),
   next_before: appNullableString,
-}).loose();
-
-export const AppToolsResponseSchema = z.object({
-  tools: z.array(z.object({
-    slug: z.string(),
-    name: z.string().default(""),
-    description: z.string().default(""),
-    auto_class: AppActionClassSchema,
-    class: AppActionClassSchema,
-    overridden: z.boolean().default(false).catch(false),
-  }).loose()).default([]),
 }).loose();
 
 export const IssueAppCallsResponseSchema = z.object({
